@@ -18,13 +18,25 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+function Test-RealPython([string]$cmd) {
+    # On Windows, "python"/"python3" can resolve to a Microsoft Store app
+    # execution alias stub even when no real interpreter is installed, so
+    # existence of the command isn't enough - actually run it and check.
+    try {
+        $output = & $cmd --version 2>&1
+        return ($LASTEXITCODE -eq 0 -and $output -match "Python \d")
+    } catch {
+        return $false
+    }
+}
+
 function Get-PythonCommand {
-    foreach ($cmd in @("python3", "python", "py")) {
-        if (Get-Command $cmd -ErrorAction SilentlyContinue) {
+    foreach ($cmd in @("py", "python3", "python")) {
+        if ((Get-Command $cmd -ErrorAction SilentlyContinue) -and (Test-RealPython $cmd)) {
             return $cmd
         }
     }
-    Write-Error "Python 3 not found. Install it from https://www.python.org/downloads/ and try again."
+    Write-Error "Python 3 not found. Install it from https://www.python.org/downloads/ (check 'Add python.exe to PATH' during setup), then run this script again."
     exit 1
 }
 
