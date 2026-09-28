@@ -31,7 +31,7 @@ function Test-RealPython([string]$cmd) {
 }
 
 function Get-PythonCommand {
-    foreach ($cmd in @("py", "python3", "python")) {
+    foreach ($cmd in @("py", "python", "python3")) {
         if ((Get-Command $cmd -ErrorAction SilentlyContinue) -and (Test-RealPython $cmd)) {
             return $cmd
         }
